@@ -33,6 +33,8 @@
             align-items: center;
             justify-content: center;
             background: radial-gradient(circle at 50% 40%, #2a1d13 0%, #120d0a 100%);
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* Ambient Glow */
@@ -305,6 +307,80 @@
             box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9);
             color: #d1c1b1;
         }
+
+        /* Responsive Layout Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            align-items: center;
+            gap: 4rem;
+            padding: 0 6rem;
+            width: 100%;
+            height: 100%;
+            transition: all 0.5s ease;
+        }
+
+        /* Responsive Scaling and Stacking */
+        @media (max-width: 1400px) {
+            .content-grid {
+                padding: 0 2rem;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                justify-items: center;
+                gap: 5rem;
+                padding: 10rem 2rem;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .perspective-container {
+                align-items: flex-start;
+            }
+
+            /* Scale components down on smaller screens */
+            .memo-container {
+                transform: scale(0.9) rotate(-0.5deg) translateY(0);
+            }
+
+            .fountain-pen-assembly {
+                display: none;
+                /* Hide pen on smaller screens to avoid overlap issues */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .memo-container {
+                transform: scale(0.7) rotate(0deg) translateY(0);
+                width: 480px;
+                /* Keep fixed width for internal logic but scale container */
+                margin-bottom: -50px;
+            }
+
+            .headphone-stand {
+                transform: scale(0.8) rotate(-3deg);
+            }
+
+            #vinyl-player-container {
+                transform: scale(0.85);
+            }
+
+            #clock-container {
+                transform: scale(0.8);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .memo-container {
+                transform: scale(0.6) translateY(0);
+                margin-bottom: -100px;
+            }
+        }
     </style>
 </head>
 
@@ -380,208 +456,212 @@
             <div class="absolute inset-0 shadow-[inset_0_0_800px_rgba(0,0,0,1)]"></div>
         </div>
 
-        <div class="relative z-10 w-full h-full grid grid-cols-[1fr_2fr_1fr] items-center px-24 gap-16">
+        <div class="relative z-10 w-full h-full">
+            <div class="content-grid">
 
-            <!-- Left Side: Time and Tea -->
-            <div class="flex flex-col gap-32 items-center justify-center">
-                <div
-                    class="bg-[#0a0a0a] border-[8px] border-[#050505] rounded-3xl p-8 shadow-[0_30px_70px_rgba(0,0,0,0.9)] transform rotate-[-4deg] ring-1 ring-white/5">
-                    <div id="clock"
-                        class="bg-[#010101] rounded-2xl p-8 font-['VT323'] text-red-600 text-7xl tracking-tighter shadow-[inset_0_0_30px_rgba(0,0,0,1)] flex items-baseline gap-3">
-                        <span id="clock-main">00:00</span>
-                        <span id="clock-sec" class="text-3xl opacity-20 tabular-nums">00</span>
-                    </div>
-                </div>
-
-                <div class="relative flex items-center justify-center">
-                    <div class="absolute inset-0 w-48 h-48 pointer-events-none z-40">
-                        <div class="steam-particle absolute top-1/2 left-1/2 w-20 h-28 bg-white/15 blur-2xl rounded-full"
-                            style="animation-delay: 0s; margin-left: -30px; margin-top: -80px;"></div>
-                        <div class="steam-particle absolute top-1/2 left-1/2 w-16 h-32 bg-white/10 blur-3xl rounded-full"
-                            style="animation-delay: 2.5s; margin-left: 0px; margin-top: -80px;"></div>
-                    </div>
+                <!-- Left Side: Time and Tea -->
+                <div id="clock-container" class="flex flex-col gap-32 items-center justify-center">
                     <div
-                        class="w-44 h-44 bg-[#e8e8e8] rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex items-center justify-center relative">
-                        <div
-                            class="w-32 h-32 bg-white rounded-full shadow-lg border border-black/5 p-1.5 flex items-center justify-center">
-                            <div
-                                class="w-full h-full rounded-full bg-[#361d14] shadow-[inset_0_15px_20px_rgba(0,0,0,0.9)] relative overflow-hidden">
-                                <div
-                                    class="absolute inset-0 opacity-10 bg-white/20 blur-xl translate-x-1/2 -translate-y-1/2">
-                                </div>
-                            </div>
+                        class="bg-[#0a0a0a] border-[8px] border-[#050505] rounded-3xl p-8 shadow-[0_30px_70px_rgba(0,0,0,0.9)] transform rotate-[-4deg] ring-1 ring-white/5">
+                        <div id="clock"
+                            class="bg-[#010101] rounded-2xl p-8 font-['VT323'] text-red-600 text-7xl tracking-tighter shadow-[inset_0_0_30px_rgba(0,0,0,1)] flex items-baseline gap-3">
+                            <span id="clock-main">00:00</span>
+                            <span id="clock-sec" class="text-3xl opacity-20 tabular-nums">00</span>
+                        </div>
+                    </div>
+
+                    <div class="relative flex items-center justify-center">
+                        <div class="absolute inset-0 w-48 h-48 pointer-events-none z-40">
+                            <div class="steam-particle absolute top-1/2 left-1/2 w-20 h-28 bg-white/15 blur-2xl rounded-full"
+                                style="animation-delay: 0s; margin-left: -30px; margin-top: -80px;"></div>
+                            <div class="steam-particle absolute top-1/2 left-1/2 w-16 h-32 bg-white/10 blur-3xl rounded-full"
+                                style="animation-delay: 2.5s; margin-left: 0px; margin-top: -80px;"></div>
                         </div>
                         <div
-                            class="absolute top-1/2 -right-6 -translate-y-1/2 w-14 h-12 bg-white rounded-r-[40px] shadow-md -z-10">
+                            class="w-44 h-44 bg-[#e8e8e8] rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex items-center justify-center relative">
+                            <div
+                                class="w-32 h-32 bg-white rounded-full shadow-lg border border-black/5 p-1.5 flex items-center justify-center">
+                                <div
+                                    class="w-full h-full rounded-full bg-[#361d14] shadow-[inset_0_15px_20px_rgba(0,0,0,0.9)] relative overflow-hidden">
+                                    <div
+                                        class="absolute inset-0 opacity-10 bg-white/20 blur-xl translate-x-1/2 -translate-y-1/2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="absolute top-1/2 -right-6 -translate-y-1/2 w-14 h-12 bg-white rounded-r-[40px] shadow-md -z-10">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Middle Side: The Journal -->
-            <div class="flex justify-center items-center h-full">
-                <div class="memo-container">
+                <!-- Middle Side: The Journal -->
+                <div class="flex justify-center items-center h-full">
+                    <div class="memo-container">
 
-                    <div class="fountain-pen-assembly">
-                        <svg viewBox="0 0 140 1000" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <linearGradient id="penLacquer" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#020202" />
-                                    <stop offset="25%" style="stop-color:#1a1a1a" />
-                                    <stop offset="45%" style="stop-color:#3a3a3a" />
-                                    <stop offset="55%" style="stop-color:#3a3a3a" />
-                                    <stop offset="75%" style="stop-color:#111" />
-                                    <stop offset="100%" style="stop-color:#000" />
-                                </linearGradient>
-                                <linearGradient id="goldPolish" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#7d4a1b" />
-                                    <stop offset="15%" style="stop-color:#b8860b" />
-                                    <stop offset="35%" style="stop-color:#fff5db" />
-                                    <stop offset="50%" style="stop-color:#ffd700" />
-                                    <stop offset="70%" style="stop-color:#b8860b" />
-                                    <stop offset="100%" style="stop-color:#5c330f" />
-                                </linearGradient>
-                                <linearGradient id="nibRhodium" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#444" />
-                                    <stop offset="50%" style="stop-color:#f8f8f8" />
-                                    <stop offset="100%" style="stop-color:#333" />
-                                </linearGradient>
-                            </defs>
-                            <rect x="40" y="50" width="60" height="750" rx="6" fill="url(#penLacquer)" />
-                            <rect x="58" y="50" width="4" height="750" fill="white" fill-opacity="0.15" />
-                            <rect x="88" y="50" width="2" height="750" fill="white" fill-opacity="0.08" />
-                            <rect x="66" y="70" width="8" height="180" rx="3" fill="url(#goldPolish)" />
-                            <circle cx="70" cy="250" r="7" fill="url(#goldPolish)" />
-                            <rect x="38" y="320" width="64" height="18" fill="url(#goldPolish)" />
-                            <rect x="38" y="325" width="64" height="2" fill="rgba(0,0,0,0.3)" />
-                            <rect x="38" y="331" width="64" height="2" fill="rgba(0,0,0,0.3)" />
-                            <path d="M45 800 L95 800 L88 880 L52 880 Z" fill="#080808" />
-                            <rect x="44" y="870" width="52" height="6" fill="url(#goldPolish)" />
-                            <path d="M52 880 L88 880 L94 960 L70 1000 L46 960 Z" fill="url(#goldPolish)" />
-                            <path d="M58 895 L82 895 L85 950 L70 975 L55 950 Z" fill="url(#nibRhodium)"
-                                fill-opacity="0.8" />
-                            <circle cx="70" cy="915" r="1.8" fill="black" fill-opacity="0.6" />
-                            <rect x="69.7" y="916" width="0.6" height="60" fill="black" fill-opacity="0.5" />
-                            <path d="M62 930 Q70 925 78 930" fill="none" stroke="black" stroke-width="0.3"
-                                stroke-opacity="0.4" />
-                        </svg>
-                    </div>
-
-                    <div class="memo-top-bind"></div>
-                    <div class="spiral-rings">
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                        <div class="spiral-ring"></div>
-                    </div>
-
-                    <div id="pages-stack" class="w-full h-full relative"></div>
-
-                    <div class="page-nav">
-                        <div id="save-page" class="save-btn" title="Save Entry as Image">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2.5">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                <polyline points="7 3 7 8 15 8"></polyline>
+                        <div class="fountain-pen-assembly">
+                            <svg viewBox="0 0 140 1000" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="penLacquer" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#020202" />
+                                        <stop offset="25%" style="stop-color:#1a1a1a" />
+                                        <stop offset="45%" style="stop-color:#3a3a3a" />
+                                        <stop offset="55%" style="stop-color:#3a3a3a" />
+                                        <stop offset="75%" style="stop-color:#111" />
+                                        <stop offset="100%" style="stop-color:#000" />
+                                    </linearGradient>
+                                    <linearGradient id="goldPolish" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#7d4a1b" />
+                                        <stop offset="15%" style="stop-color:#b8860b" />
+                                        <stop offset="35%" style="stop-color:#fff5db" />
+                                        <stop offset="50%" style="stop-color:#ffd700" />
+                                        <stop offset="70%" style="stop-color:#b8860b" />
+                                        <stop offset="100%" style="stop-color:#5c330f" />
+                                    </linearGradient>
+                                    <linearGradient id="nibRhodium" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#444" />
+                                        <stop offset="50%" style="stop-color:#f8f8f8" />
+                                        <stop offset="100%" style="stop-color:#333" />
+                                    </linearGradient>
+                                </defs>
+                                <rect x="40" y="50" width="60" height="750" rx="6" fill="url(#penLacquer)" />
+                                <rect x="58" y="50" width="4" height="750" fill="white" fill-opacity="0.15" />
+                                <rect x="88" y="50" width="2" height="750" fill="white" fill-opacity="0.08" />
+                                <rect x="66" y="70" width="8" height="180" rx="3" fill="url(#goldPolish)" />
+                                <circle cx="70" cy="250" r="7" fill="url(#goldPolish)" />
+                                <rect x="38" y="320" width="64" height="18" fill="url(#goldPolish)" />
+                                <rect x="38" y="325" width="64" height="2" fill="rgba(0,0,0,0.3)" />
+                                <rect x="38" y="331" width="64" height="2" fill="rgba(0,0,0,0.3)" />
+                                <path d="M45 800 L95 800 L88 880 L52 880 Z" fill="#080808" />
+                                <rect x="44" y="870" width="52" height="6" fill="url(#goldPolish)" />
+                                <path d="M52 880 L88 880 L94 960 L70 1000 L46 960 Z" fill="url(#goldPolish)" />
+                                <path d="M58 895 L82 895 L85 950 L70 975 L55 950 Z" fill="url(#nibRhodium)"
+                                    fill-opacity="0.8" />
+                                <circle cx="70" cy="915" r="1.8" fill="black" fill-opacity="0.6" />
+                                <rect x="69.7" y="916" width="0.6" height="60" fill="black" fill-opacity="0.5" />
+                                <path d="M62 930 Q70 925 78 930" fill="none" stroke="black" stroke-width="0.3"
+                                    stroke-opacity="0.4" />
                             </svg>
                         </div>
-                        <div id="prev-page" class="nav-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22"
-                                height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7" />
-                            </svg></div>
-                        <div id="next-page" class="nav-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22"
-                                height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5l7 7-7 7" />
-                            </svg></div>
+
+                        <div class="memo-top-bind"></div>
+                        <div class="spiral-rings">
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                            <div class="spiral-ring"></div>
+                        </div>
+
+                        <div id="pages-stack" class="w-full h-full relative"></div>
+
+                        <div class="page-nav">
+                            <div id="save-page" class="save-btn" title="Save Entry as Image">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                            </div>
+                            <div id="prev-page" class="nav-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22"
+                                    height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 19l-7-7 7-7" />
+                                </svg></div>
+                            <div id="next-page" class="nav-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22"
+                                    height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7" />
+                                </svg></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Right Side: The Music System -->
-            <div class="flex flex-col items-center justify-center gap-12 h-full">
-                <div
-                    class="relative w-80 h-40 flex items-center justify-center transform -rotate-3 hover:rotate-0 transition-transform duration-1000 headphone-stand">
+                <!-- Right Side: The Music System -->
+                <div id="vinyl-player-container" class="flex flex-col items-center justify-center gap-12 h-full">
                     <div
-                        class="absolute top-4 w-60 h-28 border-t-[18px] border-x-[16px] border-[#0f0f0f] rounded-t-[120px] shadow-[0_15px_30px_rgba(0,0,0,0.8)] bg-[#211510]">
-                        <div class="absolute inset-0 opacity-40"
-                            style="background-image: url('https://www.transparenttextures.com/patterns/leather.png');">
-                        </div>
-                    </div>
-                    <div
-                        class="absolute left-4 top-20 w-20 h-24 bg-[#121212] rounded-3xl shadow-2xl border-l-4 border-neutral-800 flex items-center justify-center">
-                        <div class="w-16 h-18 bg-[#181818] rounded-xl border border-white/5"></div>
-                    </div>
-                    <div
-                        class="absolute right-4 top-20 w-20 h-24 bg-[#121212] rounded-3xl shadow-2xl border-r-4 border-neutral-800 flex items-center justify-center">
-                        <div class="w-16 h-18 bg-[#181818] rounded-xl border border-white/5"></div>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-[#121212] p-10 rounded-[40px] shadow-[0_50px_100px_rgba(0,0,0,0.9),_inset_0_1px_3px_rgba(255,255,255,0.05)] border border-black/80 flex flex-col items-center transform rotate-[0.5deg]">
-                    <input type="file" id="audio-input" accept="audio/*" class="hidden">
-                    <audio id="audio-player"></audio>
-                    <audio id="flip-sound"
-                        src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5c97b2ffbb.mp3?filename=paper-flip-1-14567.mp3"></audio>
-
-                    <div
-                        class="w-64 h-64 bg-[#030303] rounded-full flex items-center justify-center relative shadow-[0_20px_40px_rgba(0,0,0,1),_inset_0_0_50px_rgba(0,0,0,1)] border-[12px] border-[#1a1a1a]">
-                        <div id="vinyl"
-                            class="w-56 h-56 bg-[#060606] rounded-full relative flex items-center justify-center overflow-hidden vinyl-grooves shadow-2xl">
-                            <div class="absolute inset-0 vinyl-sheen pointer-events-none"></div>
-                            <div
-                                class="w-20 h-20 bg-[#a33] rounded-full border-[6px] border-[#060606] flex flex-col items-center justify-center shadow-lg relative z-10">
-                                <div class="text-[6px] font-mono text-white/50 uppercase tracking-tighter mb-1">STEREO
-                                </div>
-                                <div class="text-[8px] font-bold text-white/80 tracking-widest">1994</div>
+                        class="relative w-80 h-40 flex items-center justify-center transform -rotate-3 hover:rotate-0 transition-transform duration-1000 headphone-stand">
+                        <div
+                            class="absolute top-4 w-60 h-28 border-t-[18px] border-x-[16px] border-[#0f0f0f] rounded-t-[120px] shadow-[0_15px_30px_rgba(0,0,0,0.8)] bg-[#211510]">
+                            <div class="absolute inset-0 opacity-40"
+                                style="background-image: url('https://www.transparenttextures.com/patterns/leather.png');">
                             </div>
                         </div>
+                        <div
+                            class="absolute left-4 top-20 w-20 h-24 bg-[#121212] rounded-3xl shadow-2xl border-l-4 border-neutral-800 flex items-center justify-center">
+                            <div class="w-16 h-18 bg-[#181818] rounded-xl border border-white/5"></div>
+                        </div>
+                        <div
+                            class="absolute right-4 top-20 w-20 h-24 bg-[#121212] rounded-3xl shadow-2xl border-r-4 border-neutral-800 flex items-center justify-center">
+                            <div class="w-16 h-18 bg-[#181818] rounded-xl border border-white/5"></div>
+                        </div>
+                    </div>
 
-                        <div class="absolute top-0 right-4 z-40">
-                            <div
-                                class="w-12 h-12 bg-neutral-800 rounded-full border-2 border-black/80 flex items-center justify-center">
-                                <div class="w-8 h-8 bg-neutral-700 rounded-full shadow-inner"></div>
-                            </div>
-                            <div id="tonearm"
-                                class="absolute top-6 left-5 w-2 h-48 bg-gradient-to-r from-neutral-500 via-neutral-300 to-neutral-600 rounded-full origin-top transition-transform duration-1000"
-                                style="transform: rotate(5deg);">
+                    <div
+                        class="bg-[#121212] p-10 rounded-[40px] shadow-[0_50px_100px_rgba(0,0,0,0.9),_inset_0_1px_3px_rgba(255,255,255,0.05)] border border-black/80 flex flex-col items-center transform rotate-[0.5deg]">
+                        <input type="file" id="audio-input" accept="audio/*" class="hidden">
+                        <audio id="audio-player"></audio>
+                        <audio id="flip-sound"
+                            src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5c97b2ffbb.mp3?filename=paper-flip-1-14567.mp3"></audio>
+
+                        <div
+                            class="w-64 h-64 bg-[#030303] rounded-full flex items-center justify-center relative shadow-[0_20px_40px_rgba(0,0,0,1),_inset_0_0_50px_rgba(0,0,0,1)] border-[12px] border-[#1a1a1a]">
+                            <div id="vinyl"
+                                class="w-56 h-56 bg-[#060606] rounded-full relative flex items-center justify-center overflow-hidden vinyl-grooves shadow-2xl">
+                                <div class="absolute inset-0 vinyl-sheen pointer-events-none"></div>
                                 <div
-                                    class="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-8 bg-neutral-900 rounded-b-xl border-x border-b border-neutral-700 flex items-end justify-center pb-1.5 shadow-lg">
-                                    <div class="w-0.5 h-2 bg-neutral-400 rounded-full"></div>
+                                    class="w-20 h-20 bg-[#a33] rounded-full border-[6px] border-[#060606] flex flex-col items-center justify-center shadow-lg relative z-10">
+                                    <div class="text-[6px] font-mono text-white/50 uppercase tracking-tighter mb-1">
+                                        STEREO
+                                    </div>
+                                    <div class="text-[8px] font-bold text-white/80 tracking-widest">1994</div>
+                                </div>
+                            </div>
+
+                            <div class="absolute top-0 right-4 z-40">
+                                <div
+                                    class="w-12 h-12 bg-neutral-800 rounded-full border-2 border-black/80 flex items-center justify-center">
+                                    <div class="w-8 h-8 bg-neutral-700 rounded-full shadow-inner"></div>
+                                </div>
+                                <div id="tonearm"
+                                    class="absolute top-6 left-5 w-2 h-48 bg-gradient-to-r from-neutral-500 via-neutral-300 to-neutral-600 rounded-full origin-top transition-transform duration-1000"
+                                    style="transform: rotate(5deg);">
+                                    <div
+                                        class="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-8 bg-neutral-900 rounded-b-xl border-x border-b border-neutral-700 flex items-end justify-center pb-1.5 shadow-lg">
+                                        <div class="w-0.5 h-2 bg-neutral-400 rounded-full"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="mt-10 flex gap-6 items-center w-full px-4">
-                        <button id="play-btn"
-                            class="w-14 h-14 flex-shrink-0 rounded-full flex items-center justify-center bg-[#080808] border-t border-white/10 shadow-[0_8px_16px_rgba(0,0,0,0.6)] text-neutral-500 hover:text-amber-500 transition-all active:scale-90">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
-                                fill="currentColor" class="ml-1">
-                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                        </button>
+                        <div class="mt-10 flex gap-6 items-center w-full px-4">
+                            <button id="play-btn"
+                                class="w-14 h-14 flex-shrink-0 rounded-full flex items-center justify-center bg-[#080808] border-t border-white/10 shadow-[0_8px_16px_rgba(0,0,0,0.6)] text-neutral-500 hover:text-amber-500 transition-all active:scale-90">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
+                                    fill="currentColor" class="ml-1">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
 
-                        <div class="flex-grow flex flex-col gap-2">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="h-1.5 flex-grow bg-black rounded-full shadow-inner overflow-hidden border border-white/5">
-                                    <div id="track-progress" class="h-full w-0 bg-amber-600/50 transition-all"></div>
+                            <div class="flex-grow flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="h-1.5 flex-grow bg-black rounded-full shadow-inner overflow-hidden border border-white/5">
+                                        <div id="track-progress" class="h-full w-0 bg-amber-600/50 transition-all">
+                                        </div>
+                                    </div>
+                                    <div id="upload-dot-btn" class="upload-dot" title="Load New Track"></div>
                                 </div>
-                                <div id="upload-dot-btn" class="upload-dot" title="Load New Track"></div>
-                            </div>
-                            <div
-                                class="flex justify-between font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-600">
-                                <span id="time-current">0:00</span>
-                                <span id="time-total">ANALOG REPRO</span>
+                                <div
+                                    class="flex justify-between font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-600">
+                                    <span id="time-current">0:00</span>
+                                    <span id="time-total">ANALOG REPRO</span>
+                                </div>
                             </div>
                         </div>
                     </div>
