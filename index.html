@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1994 Desk - Ultimate Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=VT323&family=Caveat:wght@400..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=La+Belle+Aurore&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #120d0a;
+            --desk-color: #2b1e15;
+            --paper-color: #fff9c4;
+            --ink-color: #1a2a44;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            overflow: hidden;
+            font-family: 'EB Garamond', serif;
+        }
+
+        .perspective-container {
+            perspective: 2500px;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 40%, #2a1d13 0%, #120d0a 100%);
+        }
+
+        /* Ambient Glow */
+        .ambient-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 30%, rgba(255, 145, 0, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Memo Pad Logic */
+        .memo-container {
+            position: relative;
+            width: 480px;
+            height: 640px;
+            transform-style: preserve-3d;
+            transform: rotate(-0.5deg) translateY(20px);
+            filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.5));
+        }
+
+        .memo-top-bind {
+            position: absolute;
+            top: -24px;
+            left: 0;
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(to bottom, #333, #111);
+            border-radius: 4px;
+            z-index: 100;
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.1), 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .spiral-rings {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 20px;
+            z-index: 110;
+            pointer-events: none;
+        }
+
+        .spiral-ring {
+            width: 16px;
+            height: 50px;
+            background: linear-gradient(to right, #444, #eee, #999, #eee, #444);
+            border-radius: 10px;
+            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .memo-page {
+            position: absolute;
+            inset: 0;
+            background-color: var(--paper-color);
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+                url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            background-size: 100% 2.4rem, auto;
+            border-radius: 2px 2px 8px 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transform-origin: top;
+            transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1);
+            backface-visibility: hidden;
+            z-index: 10;
+        }
+
+        .memo-page.flipped {
+            transform: rotateX(-175deg) translateY(-30px);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .memo-page-back {
+            position: absolute;
+            inset: 0;
+            background: #e6dfa1;
+            transform: rotateX(180deg);
+            backface-visibility: hidden;
+            border-radius: 8px 8px 2px 2px;
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .margin-line {
+            position: absolute;
+            left: 60px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 0, 0, 0.12);
+        }
+
+        .handwriting {
+            font-family: 'La Belle Aurore', cursive;
+            color: var(--ink-color);
+            line-height: 2.4rem;
+            font-size: 2rem;
+            resize: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            height: 100%;
+            outline: none;
+            padding: 60px 40px 60px 80px;
+            overflow: hidden;
+        }
+
+        /* AESTHETIC BIG PEN */
+        .fountain-pen-assembly {
+            position: absolute;
+            right: -160px;
+            bottom: -60px;
+            width: 70px;
+            height: 750px;
+            z-index: 300;
+            filter: drop-shadow(40px 30px 25px rgba(0, 0, 0, 0.6));
+            pointer-events: none;
+            transform: rotate(-2deg);
+        }
+
+        /* Hifi Player Elements */
+        .vinyl-grooves {
+            background:
+                radial-gradient(circle at center, transparent 35%, rgba(255, 255, 255, 0.02) 36%, transparent 37%),
+                repeating-radial-gradient(circle at center, #050505 0px, #050505 0.5px, #0a0a0a 1px, #111 1.5px);
+        }
+
+        .vinyl-sheen {
+            background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 255, 255, 0.03) 45deg, transparent 90deg, rgba(255, 255, 255, 0.03) 135deg, transparent 180deg, rgba(255, 255, 255, 0.03) 225deg, transparent 270deg, rgba(255, 255, 255, 0.03) 315deg, transparent 360deg);
+        }
+
+        .headphone-stand {
+            filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.7));
+        }
+
+        @keyframes steamMove {
+            0% {
+                transform: translateY(0) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+
+            15% {
+                opacity: 0.5;
+            }
+
+            80% {
+                opacity: 0.15;
+            }
+
+            100% {
+                transform: translateY(-240px) scale(5) rotate(60deg);
+                opacity: 0;
+            }
+        }
+
+        .steam-particle {
+            animation: steamMove 8s infinite ease-out;
+            filter: url(#steamFilter);
+        }
+
+        .page-nav {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 150;
+        }
+
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.07);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        .save-btn {
+            background: transparent;
+            color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a3a5f;
+            transform: scale(1.1);
+        }
+
+        .save-btn:hover {
+            background: #254b7a;
+            transform: translateY(-1px);
+        }
+
+        /* Upload Button Dot Style */
+        .upload-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #b8860b, #5c330f);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            transition: all 0.1s;
+        }
+
+        .upload-dot:hover {
+            filter: brightness(1.3);
+            transform: scale(1.2);
+        }
+
+        .upload-dot:active {
+            transform: scale(0.9);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Intro Splash Styles */
+        #intro-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            transition: opacity 1s ease, visibility 1s;
+        }
+
+        #intro-splash.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .intro-card {
+            background: linear-gradient(135deg, #2a1d13, #1a120c);
+            padding: 3rem;
+            border-radius: 2rem;
+            max-width: 700px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9);
+            color: #d1c1b1;
+        }
+    </style>
+</head>
+
+<body>
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="steamFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="3" seed="2">
+                <animate attributeName="baseFrequency" dur="10s" values="0.02 0.05;0.03 0.07;0.02 0.05"
+                    repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" scale="50" />
+            <feGaussianBlur stdDeviation="4" />
+        </filter>
+    </svg>
+
+    <!-- Intro Splash Screen -->
+    <div id="intro-splash">
+        <div class="intro-card text-center">
+            <h1 class="text-5xl font-['VT323'] text-amber-600 mb-6 tracking-widest">2000s DESK: RETRO</h1>
+            <p class="text-xl mb-8 leading-relaxed italic">A tactile escape to a quieter time. Capture your thoughts,
+                look at the time, and enjoy the music.</p>
+
+            <div class="grid grid-cols-2 gap-8 text-left mb-10">
+                <div class="space-y-4">
+                    <h3 class="font-bold text-amber-500 uppercase tracking-widest text-sm flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z" />
+                        </svg>
+                        The Journal
+                    </h3>
+                    <ul class="text-sm space-y-2 opacity-80">
+                        <li>• Click the arrows to flip pages.</li>
+                        <li>• New pages are created automatically.</li>
+                        <li>• "Save Entry" downloads your work as an image.</li>
+                        <li>• Progress is saved to your browser automatically.</li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="font-bold text-amber-500 uppercase tracking-widest text-sm flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M11.5 13a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5M12 1h-1v1.5a.5.5 0 0 1-1 0V1H8v1.5a.5.5 0 0 1-1 0V1H5v1.5a.5.5 0 0 1-1 0V1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 14V3h12v11z" />
+                        </svg>
+                        Analog Audio
+                    </h3>
+                    <ul class="text-sm space-y-2 opacity-80">
+                        <li>• Click Play to load an audio file from your device.</li>
+                        <li>• Use the <span class="inline-block w-2 h-2 rounded-full bg-amber-700"></span> dot to switch
+                            tracks anytime.</li>
+                        <li>• Watch the tonearm move as the vinyl spins.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="dismissIntro()"
+                class="bg-amber-700 hover:bg-amber-600 text-white px-10 py-4 rounded-full font-bold tracking-widest transition-all transform hover:scale-105 active:scale-95 shadow-xl">
+                START THE SESSION
+            </button>
+        </div>
+    </div>
+
+    <div class="perspective-container">
+        <div class="ambient-glow"></div>
+
+        <!-- Desk Surface -->
+        <div class="absolute inset-0 z-0 bg-[#241911]">
+            <div class="absolute inset-0 opacity-40"
+                style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png'); background-size: 1000px;">
+            </div>
+            <div class="absolute inset-0 shadow-[inset_0_0_800px_rgba(0,0,0,1)]"></div>
+        </div>
+
+        <div class="relative z-10 w-full h-full grid grid-cols-[1fr_2fr_1fr] items-center px-24 gap-16">
+
+            <!-- Left Side: Time and Tea -->
+            <div class="flex flex-col gap-32 items-center justify-center">
+                <div
+                    class="bg-[#0a0a0a] border-[8px] border-[#050505] rounded-3xl p-8 shadow-[0_30px_70px_rgba(0,0,0,0.9)] transform rotate-[-4deg] ring-1 ring-white/5">
+                    <div id="clock"
+                        class="bg-[#010101] rounded-2xl p-8 font-['VT323'] text-red-600 text-7xl tracking-tighter shadow-[inset_0_0_30px_rgba(0,0,0,1)] flex items-baseline gap-3">
+                        <span id="clock-main">00:00</span>
+                        <span id="clock-sec" class="text-3xl opacity-20 tabular-nums">00</span>
+                    </div>
+                </div>
+
+                <div class="relative flex items-center justify-center">
+                    <div class="absolute inset-0 w-48 h-48 pointer-events-none z-40">
+                        <div class="steam-particle absolute top-1/2 left-1/2 w-20 h-28 bg-white/15 blur-2xl rounded-full"
+                            style="animation-delay: 0s; margin-left: -30px; margin-top: -80px;"></div>
+                        <div class="steam-particle absolute top-1/2 left-1/2 w-16 h-32 bg-white/10 blur-3xl rounded-full"
+                            style="animation-delay: 2.5s; margin-left: 0px; margin-top: -80px;"></div>
+                    </div>
+                    <div
+                        class="w-44 h-44 bg-[#e8e8e8] rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex items-center justify-center relative">
+                        <div
+                            class="w-32 h-32 bg-white rounded-full shadow-lg border border-black/5 p-1.5 flex items-center justify-center">
+                            <div
+                                class="w-full h-full rounded-full bg-[#361d14] shadow-[inset_0_15px_20px_rgba(0,0,0,0.9)] relative overflow-hidden">
+                                <div
+                                    class="absolute inset-0 opacity-10 bg-white/20 blur-xl translate-x-1/2 -translate-y-1/2">
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute top-1/2 -right-6 -translate-y-1/2 w-14 h-12 bg-white rounded-r-[40px] shadow-md -z-10">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Side: The Journal -->
+            <div class="flex justify-center items-center h-full">
+                <div class="memo-container">
+
+                    <div class="fountain-pen-assembly">
+                        <svg viewBox="0 0 140 1000" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="penLacquer" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#020202" />
+                                    <stop offset="25%" style="stop-color:#1a1a1a" />
+                                    <stop offset="45%" style="stop-color:#3a3a3a" />
+                                    <stop offset="55%" style="stop-color:#3a3a3a" />
+                                    <stop offset="75%" style="stop-color:#111" />
+                                    <stop offset="100%" style="stop-color:#000" />
+                                </linearGradient>
+                                <linearGradient id="goldPolish" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#7d4a1b" />
+                                    <stop offset="15%" style="stop-color:#b8860b" />
+                                    <stop offset="35%" style="stop-color:#fff5db" />
+                                    <stop offset="50%" style="stop-color:#ffd700" />
+                                    <stop offset="70%" style="stop-color:#b8860b" />
+                                    <stop offset="100%" style="stop-color:#5c330f" />
+                                </linearGradient>
+                                <linearGradient id="nibRhodium" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#444" />
+                                    <stop offset="50%" style="stop-color:#f8f8f8" />
+                                    <stop offset="100%" style="stop-color:#333" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="40" y="50" width="60" height="750" rx="6" fill="url(#penLacquer)" />
+                            <rect x="58" y="50" width="4" height="750" fill="white" fill-opacity="0.15" />
+                            <rect x="88" y="50" width="2" height="750" fill="white" fill-opacity="0.08" />
+                            <rect x="66" y="70" width="8" height="180" rx="3" fill="url(#goldPolish)" />
+                            <circle cx="70" cy="250" r="7" fill="url(#goldPolish)" />
+                            <rect x="38" y="320" width="64" height="18" fill="url(#goldPolish)" />
+                            <rect x="38" y="325" width="64" height="2" fill="rgba(0,0,0,0.3)" />
+                            <rect x="38" y="331" width="64" height="2" fill="rgba(0,0,0,0.3)" />
+                            <path d="M45 800 L95 800 L88 880 L52 880 Z" fill="#080808" />
+                            <rect x="44" y="870" width="52" height="6" fill="url(#goldPolish)" />
+                            <path d="M52 880 L88 880 L94 960 L70 1000 L46 960 Z" fill="url(#goldPolish)" />
+                            <path d="M58 895 L82 895 L85 950 L70 975 L55 950 Z" fill="url(#nibRhodium)"
+                                fill-opacity="0.8" />
+                            <circle cx="70" cy="915" r="1.8" fill="black" fill-opacity="0.6" />
+                            <rect x="69.7" y="916" width="0.6" height="60" fill="black" fill-opacity="0.5" />
+                            <path d="M62 930 Q70 925 78 930" fill="none" stroke="black" stroke-width="0.3"
+                                stroke-opacity="0.4" />
+                        </svg>
+                    </div>
+
+                    <div class="memo-top-bind"></div>
+                    <div class="spiral-rings">
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                        <div class="spiral-ring"></div>
+                    </div>
+
+                    <div id="pages-stack" class="w-full h-full relative"></div>
+
+                    <div class="page-nav">
+                        <div id="save-page" class="save-btn" title="Save Entry as Image">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                        </div>
+                        <div id="prev-page" class="nav-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22"
+                                height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 19l-7-7 7-7" />
+                            </svg></div>
+                        <div id="next-page" class="nav-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22"
+                                height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: The Music System -->
+            <div class="flex flex-col items-center justify-center gap-12 h-full">
+                <div
+                    class="relative w-80 h-40 flex items-center justify-center transform -rotate-3 hover:rotate-0 transition-transform duration-1000 headphone-stand">
+                    <div
+                        class="absolute top-4 w-60 h-28 border-t-[18px] border-x-[16px] border-[#0f0f0f] rounded-t-[120px] shadow-[0_15px_30px_rgba(0,0,0,0.8)] bg-[#211510]">
+                        <div class="absolute inset-0 opacity-40"
+                            style="background-image: url('https://www.transparenttextures.com/patterns/leather.png');">
+                        </div>
+                    </div>
+                    <div
+                        class="absolute left-4 top-20 w-20 h-24 bg-[#121212] rounded-3xl shadow-2xl border-l-4 border-neutral-800 flex items-center justify-center">
+                        <div class="w-16 h-18 bg-[#181818] rounded-xl border border-white/5"></div>
+                    </div>
+                    <div
+                        class="absolute right-4 top-20 w-20 h-24 bg-[#121212] rounded-3xl shadow-2xl border-r-4 border-neutral-800 flex items-center justify-center">
+                        <div class="w-16 h-18 bg-[#181818] rounded-xl border border-white/5"></div>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-[#121212] p-10 rounded-[40px] shadow-[0_50px_100px_rgba(0,0,0,0.9),_inset_0_1px_3px_rgba(255,255,255,0.05)] border border-black/80 flex flex-col items-center transform rotate-[0.5deg]">
+                    <input type="file" id="audio-input" accept="audio/*" class="hidden">
+                    <audio id="audio-player"></audio>
+                    <audio id="flip-sound"
+                        src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5c97b2ffbb.mp3?filename=paper-flip-1-14567.mp3"></audio>
+
+                    <div
+                        class="w-64 h-64 bg-[#030303] rounded-full flex items-center justify-center relative shadow-[0_20px_40px_rgba(0,0,0,1),_inset_0_0_50px_rgba(0,0,0,1)] border-[12px] border-[#1a1a1a]">
+                        <div id="vinyl"
+                            class="w-56 h-56 bg-[#060606] rounded-full relative flex items-center justify-center overflow-hidden vinyl-grooves shadow-2xl">
+                            <div class="absolute inset-0 vinyl-sheen pointer-events-none"></div>
+                            <div
+                                class="w-20 h-20 bg-[#a33] rounded-full border-[6px] border-[#060606] flex flex-col items-center justify-center shadow-lg relative z-10">
+                                <div class="text-[6px] font-mono text-white/50 uppercase tracking-tighter mb-1">STEREO
+                                </div>
+                                <div class="text-[8px] font-bold text-white/80 tracking-widest">1994</div>
+                            </div>
+                        </div>
+
+                        <div class="absolute top-0 right-4 z-40">
+                            <div
+                                class="w-12 h-12 bg-neutral-800 rounded-full border-2 border-black/80 flex items-center justify-center">
+                                <div class="w-8 h-8 bg-neutral-700 rounded-full shadow-inner"></div>
+                            </div>
+                            <div id="tonearm"
+                                class="absolute top-6 left-5 w-2 h-48 bg-gradient-to-r from-neutral-500 via-neutral-300 to-neutral-600 rounded-full origin-top transition-transform duration-1000"
+                                style="transform: rotate(5deg);">
+                                <div
+                                    class="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-8 bg-neutral-900 rounded-b-xl border-x border-b border-neutral-700 flex items-end justify-center pb-1.5 shadow-lg">
+                                    <div class="w-0.5 h-2 bg-neutral-400 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 flex gap-6 items-center w-full px-4">
+                        <button id="play-btn"
+                            class="w-14 h-14 flex-shrink-0 rounded-full flex items-center justify-center bg-[#080808] border-t border-white/10 shadow-[0_8px_16px_rgba(0,0,0,0.6)] text-neutral-500 hover:text-amber-500 transition-all active:scale-90">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
+                                fill="currentColor" class="ml-1">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </button>
+
+                        <div class="flex-grow flex flex-col gap-2">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="h-1.5 flex-grow bg-black rounded-full shadow-inner overflow-hidden border border-white/5">
+                                    <div id="track-progress" class="h-full w-0 bg-amber-600/50 transition-all"></div>
+                                </div>
+                                <div id="upload-dot-btn" class="upload-dot" title="Load New Track"></div>
+                            </div>
+                            <div
+                                class="flex justify-between font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-600">
+                                <span id="time-current">0:00</span>
+                                <span id="time-total">ANALOG REPRO</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Intro Logic
+        function dismissIntro() {
+            document.getElementById('intro-splash').classList.add('hidden');
+        }
+
+        // State Management
+        let pageData = JSON.parse(localStorage.getItem('memo_ultimate_94')) || [""];
+        let currentPageIndex = 0;
+        const pagesStack = document.getElementById('pages-stack');
+        const prevBtn = document.getElementById('prev-page');
+        const nextBtn = document.getElementById('next-page');
+        const saveBtn = document.getElementById('save-page');
+        const flipSound = document.getElementById('flip-sound');
+
+        // Clock Update
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock-main').textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            document.getElementById('clock-sec').textContent = now.getSeconds().toString().padStart(2, '0');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Memo Pad Logic
+        function renderPages() {
+            pagesStack.innerHTML = '';
+            for (let i = pageData.length - 1; i >= 0; i--) {
+                const page = document.createElement('div');
+                page.className = `memo-page ${i < currentPageIndex ? 'flipped' : ''}`;
+                page.style.zIndex = pageData.length - i;
+
+                page.innerHTML = `
+                    <div class="margin-line"></div>
+                    <textarea class="handwriting" spellcheck="false" placeholder="October '94 thoughts...">${pageData[i] || ''}</textarea>
+                    <div class="absolute top-5 right-8 text-[11px] text-neutral-400 font-mono tracking-widest">LOG ${i + 1}</div>
+                    <div class="memo-page-back"></div>
+                `;
+
+                const textarea = page.querySelector('textarea');
+
+                textarea.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    pageData[i] = val;
+
+                    // Check for overflow
+                    if (textarea.scrollHeight > textarea.clientHeight) {
+                        handlePageOverflow(textarea, i);
+                    } else {
+                        localStorage.setItem('memo_ultimate_94', JSON.stringify(pageData));
+                    }
+                });
+
+                pagesStack.appendChild(page);
+            }
+        }
+
+        prevBtn.onclick = () => {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                triggerFlip();
+            }
+        };
+
+        nextBtn.onclick = () => {
+            if (currentPageIndex === pageData.length - 1) {
+                pageData.push("");
+                localStorage.setItem('memo_ultimate_94', JSON.stringify(pageData));
+            }
+            currentPageIndex++;
+            triggerFlip();
+        };
+
+        function handlePageOverflow(textarea, index) {
+            let fullText = textarea.value;
+            let currentText = fullText;
+            let overflowText = "";
+
+            // Binary search or simple loop to find the break point
+            while (textarea.scrollHeight > textarea.clientHeight && currentText.length > 0) {
+                overflowText = currentText.slice(-1) + overflowText;
+                currentText = currentText.slice(0, -1);
+                textarea.value = currentText;
+            }
+
+            pageData[index] = currentText;
+
+            // Move to next page
+            if (index === pageData.length - 1) {
+                pageData.push(overflowText);
+            } else {
+                pageData[index + 1] = overflowText + pageData[index + 1];
+            }
+
+            localStorage.setItem('memo_ultimate_94', JSON.stringify(pageData));
+
+            // Auto flip to next page
+            currentPageIndex = index + 1;
+            triggerFlip();
+
+            // Focus the next textarea and place cursor at start
+            setTimeout(() => {
+                const nextTextarea = document.querySelectorAll('.handwriting')[pageData.length - 1 - currentPageIndex];
+                if (nextTextarea) {
+                    nextTextarea.focus();
+                    nextTextarea.setSelectionRange(overflowText.length, overflowText.length);
+                }
+            }, 900);
+        }
+
+        function triggerFlip() {
+            flipSound.currentTime = 0;
+            flipSound.volume = 0.4;
+            flipSound.play();
+            renderPages();
+        }
+
+        // Image Download Action
+        saveBtn.onclick = async () => {
+            const content = pageData[currentPageIndex];
+            if (!content || content.trim() === "") return;
+
+            const memoContainer = document.querySelector('.memo-container');
+            const handwritings = document.querySelectorAll('.handwriting');
+            const activeTextarea = handwritings[pageData.length - 1 - currentPageIndex];
+
+            try {
+                // High-quality capture logic
+                const canvas = await html2canvas(memoContainer, {
+                    backgroundColor: "#120d0a",
+                    scale: 3,
+                    useCORS: true,
+                    logging: false,
+                    onclone: (clonedDoc) => {
+                        // 1. Hide UI elements
+                        const pageNav = clonedDoc.querySelector('.page-nav');
+                        if (pageNav) pageNav.style.display = 'none';
+
+                        // 2. Flatten 3D layout
+                        const clonedContainer = clonedDoc.querySelector('.memo-container');
+                        if (clonedContainer) {
+                            clonedContainer.style.transform = 'none';
+                            clonedContainer.style.filter = 'none';
+                            clonedContainer.style.perspective = 'none';
+                            clonedContainer.style.margin = '0';
+                        }
+
+                        // 3. Isolate active page and sync text
+                        const clonedPages = clonedDoc.querySelectorAll('.memo-page');
+                        const activePageIndexInDOM = pageData.length - 1 - currentPageIndex;
+
+                        clonedPages.forEach((p, idx) => {
+                            p.style.transform = 'none';
+                            p.style.transition = 'none';
+
+                            // Hide the back of the page which causes overlap when flattened
+                            const back = p.querySelector('.memo-page-back');
+                            if (back) back.style.display = 'none';
+
+                            if (idx !== activePageIndexInDOM) {
+                                p.style.display = 'none';
+                            } else {
+                                p.style.display = 'block';
+                                p.style.zIndex = '1000';
+
+                                // Sync text value manually to the clone
+                                const clonedTextarea = p.querySelector('.handwriting');
+                                if (clonedTextarea && activeTextarea) {
+                                    const val = activeTextarea.value;
+                                    const div = clonedDoc.createElement('div');
+
+                                    // Use a simpler approach to copy essential display styles
+                                    div.className = clonedTextarea.className;
+                                    div.style.whiteSpace = 'pre-wrap';
+                                    div.style.wordWrap = 'break-word';
+                                    div.style.height = '100%';
+                                    div.style.width = '100%';
+                                    div.style.padding = '60px 30px 30px 80px';
+                                    div.innerText = val;
+
+                                    clonedTextarea.parentNode.replaceChild(div, clonedTextarea);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                const url = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                const dateStr = new Date().toLocaleDateString().split('/').join('-');
+
+                a.href = url;
+                a.download = `Diary-Entry-${currentPageIndex + 1}-${dateStr}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (err) {
+                console.error("Capture failed:", err);
+            }
+        };
+
+        // Hifi System Logic
+        const audioInput = document.getElementById('audio-input');
+        const audioPlayer = document.getElementById('audio-player');
+        const playBtn = document.getElementById('play-btn');
+        const uploadDotBtn = document.getElementById('upload-dot-btn');
+        const vinyl = document.getElementById('vinyl');
+        const tonearm = document.getElementById('tonearm');
+        const progress = document.getElementById('track-progress');
+        const timeCurrent = document.getElementById('time-current');
+
+        let isPlaying = false;
+        let rotation = 0;
+
+        function animateVinyl() {
+            if (isPlaying) {
+                rotation = (rotation + 0.6) % 360;
+                vinyl.style.transform = `rotate(${rotation}deg)`;
+
+                if (audioPlayer.duration) {
+                    const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                    progress.style.width = `${pct}%`;
+                    const m = Math.floor(audioPlayer.currentTime / 60);
+                    const s = Math.floor(audioPlayer.currentTime % 60);
+                    timeCurrent.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+                }
+                requestAnimationFrame(animateVinyl);
+            }
+        }
+
+        playBtn.onclick = () => {
+            if (!audioPlayer.src) { audioInput.click(); return; }
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+            } else {
+                audioPlayer.play();
+                isPlaying = true;
+                animateVinyl();
+            }
+            updatePlayerUI();
+        };
+
+        uploadDotBtn.onclick = () => {
+            audioInput.click();
+        };
+
+        function updatePlayerUI() {
+            playBtn.classList.toggle('text-amber-500', isPlaying);
+            tonearm.style.transform = isPlaying ? 'rotate(32deg)' : 'rotate(5deg)';
+            playBtn.innerHTML = isPlaying ?
+                `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>` :
+                `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" class="ml-1"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        }
+
+        audioInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                audioPlayer.src = URL.createObjectURL(file);
+                isPlaying = false;
+                audioPlayer.oncanplay = () => {
+                    if (!isPlaying) {
+                        playBtn.click();
+                        audioPlayer.oncanplay = null;
+                    }
+                };
+            }
+        };
+
+        // Init
+        renderPages();
+    </script>
+</body>
+
+</html>
